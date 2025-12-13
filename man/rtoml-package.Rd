@@ -8,6 +8,14 @@
 \description{
 What the package does (one paragraph).
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/MarkPaulin/rtoml}
+  \item Report bugs at \url{https://github.com/MarkPaulin/rtoml/issues}
+}
+
+}
 \author{
 \strong{Maintainer}: Mark Paulin \email{paulin.mark@googlemail.com}
 

@@ -1,4 +1,4 @@
 #' @useDynLib rtoml, .registration = TRUE
-parse_from_str <- function(file) {
-  .Call(parse_from_str_, file)
+parse_from_str <- function(x) {
+  .Call(parse_from_str_, x)
 }
