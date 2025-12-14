@@ -155,13 +155,15 @@ SEXP parse_from_str_(SEXP str) {
     toml_result_t result = toml_parse(str_c, strlen(str_c));
 
     if (!result.ok) {
+        char msg[200];
+        memcpy(msg, result.errmsg, 200); 
         toml_free(result);
-        return Rf_allocVector(STRSXP, 0);
+        Rf_error("%s", msg);
     }
 
     if (result.toptab.type == TOML_UNKNOWN) {
         toml_free(result);
-        return Rf_allocVector(STRSXP, 0);
+        Rf_error("Unknown datum type");
     }
 
     SEXP res = PROTECT(parse_node(result.toptab));
@@ -176,13 +178,15 @@ SEXP parse_from_file_(SEXP path) {
     toml_result_t result = toml_parse_file_ex(filename);
 
     if (!result.ok) {
+        char msg[200];
+        memcpy(msg, result.errmsg, 200); 
         toml_free(result);
-        return Rf_allocVector(STRSXP, 0);
+        Rf_error("%s", msg);
     }
 
     if (result.toptab.type == TOML_UNKNOWN) {
         toml_free(result);
-        return Rf_allocVector(STRSXP, 0);
+        Rf_error("Unknown datum type");
     }
 
     SEXP res = PROTECT(parse_node(result.toptab));

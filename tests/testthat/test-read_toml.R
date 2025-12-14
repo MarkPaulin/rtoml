@@ -39,3 +39,8 @@ role = "backend"
     )
   )
 })
+
+test_that("invalid toml is not parsed", {
+  expect_error(read_toml_str("this is not valid"))
+  expect_error(read_toml_str("wrong = 2025-2"))
+})
