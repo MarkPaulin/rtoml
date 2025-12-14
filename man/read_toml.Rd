@@ -10,7 +10,8 @@ read_toml_str(x)
 read_toml(x)
 }
 \arguments{
-\item{x}{A length-one character vector}
+\item{x}{A length-one character vector, either a path to a file for
+\code{read_toml()} or a TOML document for \code{read_toml_str()}}
 }
 \value{
 A list

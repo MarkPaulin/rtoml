@@ -41,18 +41,74 @@ SEXP parse_boolean(toml_datum_t node) {
   return Rf_ScalarLogical(node.u.boolean);
 }
 
-SEXP parse_ts(toml_datum_t node) {
-  SEXP out = PROTECT(Rf_allocVector(INTSXP, 8));
-  SET_INTEGER_ELT(out, 0, node.u.ts.year);
-  SET_INTEGER_ELT(out, 1, node.u.ts.month);
-  SET_INTEGER_ELT(out, 2, node.u.ts.day);
-  SET_INTEGER_ELT(out, 3, node.u.ts.hour);
-  SET_INTEGER_ELT(out, 4, node.u.ts.minute);
-  SET_INTEGER_ELT(out, 5, node.u.ts.second);
-  SET_INTEGER_ELT(out, 6, node.u.ts.usec);
-  SET_INTEGER_ELT(out, 7, node.u.ts.tz);
-  UNPROTECT(1);
-  return out;
+SEXP parse_local_date(toml_datum_t node) {
+  SEXP vals = PROTECT(Rf_allocVector(INTSXP, 3));
+
+  SET_INTEGER_ELT(vals, 0, node.u.ts.year);
+  SET_INTEGER_ELT(vals, 1, node.u.ts.month);
+  SET_INTEGER_ELT(vals, 2, node.u.ts.day);
+
+  SEXP class = PROTECT(Rf_allocVector(STRSXP, 1));
+  SET_STRING_ELT(class, 0, Rf_mkChar("rtoml_local_date"));
+  Rf_classgets(vals, class);
+
+  UNPROTECT(2);
+  return vals;
+}
+
+SEXP parse_local_datetime(toml_datum_t node) {
+  SEXP vals = PROTECT(Rf_allocVector(INTSXP, 7));
+
+  SET_INTEGER_ELT(vals, 0, node.u.ts.year);
+  SET_INTEGER_ELT(vals, 1, node.u.ts.month);
+  SET_INTEGER_ELT(vals, 2, node.u.ts.day);
+  SET_INTEGER_ELT(vals, 3, node.u.ts.hour);
+  SET_INTEGER_ELT(vals, 4, node.u.ts.minute);
+  SET_INTEGER_ELT(vals, 5, node.u.ts.second);
+  SET_INTEGER_ELT(vals, 6, node.u.ts.usec);
+
+  SEXP class = PROTECT(Rf_allocVector(STRSXP, 1));
+  SET_STRING_ELT(class, 0, Rf_mkChar("rtoml_local_datetime"));
+  Rf_classgets(vals, class);
+
+  UNPROTECT(2);
+  return vals;
+}
+
+SEXP parse_datetime(toml_datum_t node) {
+  SEXP vals = PROTECT(Rf_allocVector(INTSXP, 8));
+
+  SET_INTEGER_ELT(vals, 0, node.u.ts.year);
+  SET_INTEGER_ELT(vals, 1, node.u.ts.month);
+  SET_INTEGER_ELT(vals, 2, node.u.ts.day);
+  SET_INTEGER_ELT(vals, 3, node.u.ts.hour);
+  SET_INTEGER_ELT(vals, 4, node.u.ts.minute);
+  SET_INTEGER_ELT(vals, 5, node.u.ts.second);
+  SET_INTEGER_ELT(vals, 6, node.u.ts.usec);
+  SET_INTEGER_ELT(vals, 7, node.u.ts.tz);
+
+  SEXP class = PROTECT(Rf_allocVector(STRSXP, 1));
+  SET_STRING_ELT(class, 0, Rf_mkChar("rtoml_datetime"));
+  Rf_classgets(vals, class);
+
+  UNPROTECT(2);
+  return vals;
+}
+
+SEXP parse_time(toml_datum_t node) {
+  SEXP vals = PROTECT(Rf_allocVector(INTSXP, 4));
+
+  SET_INTEGER_ELT(vals, 0, node.u.ts.hour);
+  SET_INTEGER_ELT(vals, 1, node.u.ts.minute);
+  SET_INTEGER_ELT(vals, 2, node.u.ts.second);
+  SET_INTEGER_ELT(vals, 3, node.u.ts.usec);
+
+  SEXP class = PROTECT(Rf_allocVector(STRSXP, 1));
+  SET_STRING_ELT(class, 0, Rf_mkChar("rtoml_time"));
+  Rf_classgets(vals, class);
+
+  UNPROTECT(2);
+  return vals;
 }
 
 SEXP parse_array(toml_datum_t node) {
@@ -80,10 +136,13 @@ SEXP parse_node(toml_datum_t node) {
   case TOML_BOOLEAN:
     return parse_boolean(node);
   case TOML_DATE:
-  case TOML_DATETIME:
-  case TOML_DATETIMETZ:
+    return parse_local_date(node);
   case TOML_TIME:
-    return parse_ts(node);
+    return parse_time(node);
+  case TOML_DATETIME:
+    return parse_local_datetime(node);
+  case TOML_DATETIMETZ:
+    return parse_datetime(node);
   case TOML_ARRAY:
     return parse_array(node);
   default:

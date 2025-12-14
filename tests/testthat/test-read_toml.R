@@ -26,4 +26,16 @@ role = "backend"
 
   out <- read_toml_str(toml_str)
   expect_equal(out[["title"]], "TOML Example")
+  expect_equal(names(out), c("title", "owner", "database", "servers"))
+  expect_equal(names(out[["servers"]]), c("alpha", "beta"))
+  expect_equal(
+    out[["owner"]],
+    list(
+      name = "Tom Preston-Werner",
+      dob = structure(
+        c(1979, 5, 27, 7, 32, 0, 0, -480),
+        class = "rtoml_datetime"
+      )
+    )
+  )
 })
