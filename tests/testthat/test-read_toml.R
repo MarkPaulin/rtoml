@@ -23,7 +23,7 @@ role = "frontend"
 ip = "10.0.0.2"
 role = "backend"  
 '
-  
+
   out <- read_toml_str(toml_str)
   expect_equal(out[["title"]], "TOML Example")
 })
