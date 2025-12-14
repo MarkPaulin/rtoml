@@ -2,7 +2,7 @@
 #'
 #' @param x A length-one character vector
 #'
-#' @returns A list 
+#' @returns A list
 #'
 #' @export
 read_toml_str <- function(x) {
