@@ -3,3 +3,5 @@
 ^\.vscode$
 ^\.github$
 ^README\.Rmd$
+^rtoml\.Rproj$
+^\.Rproj\.user$

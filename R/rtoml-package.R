@@ -2,14 +2,6 @@
 "_PACKAGE"
 
 ## usethis namespace: start
+#' @useDynLib rtoml, .registration = TRUE
 ## usethis namespace: end
 NULL
-
-#' @useDynLib rtoml, .registration = TRUE
-parse_from_str <- function(x) {
-  .Call(parse_from_str_, x)
-}
-
-parse_from_file <- function(x) {
-  .Call(parse_from_file_, x)
-}

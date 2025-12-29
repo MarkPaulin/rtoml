@@ -2,16 +2,16 @@
 % Please edit documentation in R/read_toml.R
 \name{read_toml}
 \alias{read_toml}
-\alias{read_toml_str}
+\alias{parse_toml}
 \title{Convert a TOML string to an R list}
 \usage{
-read_toml_str(x)
+parse_toml(x)
 
 read_toml(x)
 }
 \arguments{
 \item{x}{A length-one character vector, either a path to a file for
-\code{read_toml()} or a TOML document for \code{read_toml_str()}}
+\code{read_toml()} or a TOML document for \code{parse_toml()}}
 }
 \value{
 A list

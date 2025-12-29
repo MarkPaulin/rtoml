@@ -24,7 +24,7 @@ ip = "10.0.0.2"
 role = "backend"  
 '
 
-  out <- read_toml_str(toml_str)
+  out <- parse_toml(toml_str)
   expect_equal(out[["title"]], "TOML Example")
   expect_equal(names(out), c("title", "owner", "database", "servers"))
   expect_equal(names(out[["servers"]]), c("alpha", "beta"))
@@ -41,6 +41,6 @@ role = "backend"
 })
 
 test_that("invalid toml is not parsed", {
-  expect_error(read_toml_str("this is not valid"))
-  expect_error(read_toml_str("wrong = 2025-2"))
+  expect_error(parse_toml("this is not valid"))
+  expect_error(parse_toml("wrong = 2025-2"))
 })
