@@ -11,11 +11,11 @@ NULL
 #' @rdname read_toml
 #' @export
 parse_toml <- function(x) {
-  .Call(parse_from_str_, x)
+  .Call(parse_toml_, x)
 }
 
 #' @rdname read_toml
 #' @export
 read_toml <- function(x) {
-  .Call(parse_from_file_, x)
+  .Call(read_toml_, x)
 }
