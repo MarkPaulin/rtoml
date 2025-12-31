@@ -10,47 +10,78 @@
 coverage](https://codecov.io/gh/MarkPaulin/rtoml/graph/badge.svg)](https://app.codecov.io/gh/MarkPaulin/rtoml)
 <!-- badges: end -->
 
-The goal of rtoml is to …
+rtoml is a wrapper around [tomlc17](https://github.com/cktan/tomlc17), a
+TOML parser written in C.
 
 ## Installation
 
-You can install the development version of rtoml from
-[GitHub](https://github.com/) with:
+You can install the development version of rtoml with:
 
 ``` r
 # install.packages("pak")
 pak::pak("MarkPaulin/rtoml")
 ```
 
-## Example
+## Usage
 
-This is a basic example which shows you how to solve a common problem:
+Convert TOML documents into lists:
 
 ``` r
 library(rtoml)
-## basic example code
+
+x <- parse_toml('
+title = "rtoml!"
+today = 2025-12-30
+
+[package]
+status = "In development"
+
+[package.todo]
+dates = "Convert to R date types"
+arrays = "Flatten them into vectors"
+')
+
+# or...
+# x <- read_toml("file.toml")
+
+str(x)
+#> List of 3
+#>  $ title  : chr "rtoml!"
+#>  $ today  : 'rtoml_local_date' int [1:3] 2025 12 30
+#>  $ package:List of 2
+#>   ..$ status: chr "In development"
+#>   ..$ todo  :List of 2
+#>   .. ..$ dates : chr "Convert to R date types"
+#>   .. ..$ arrays: chr "Flatten them into vectors"
 ```
 
-What is special about using `README.Rmd` instead of just `README.md`?
-You can include R chunks like so:
+## Limitations
 
-``` r
-summary(cars)
-#>      speed           dist       
-#>  Min.   : 4.0   Min.   :  2.00  
-#>  1st Qu.:12.0   1st Qu.: 26.00  
-#>  Median :15.0   Median : 36.00  
-#>  Mean   :15.4   Mean   : 42.98  
-#>  3rd Qu.:19.0   3rd Qu.: 56.00  
-#>  Max.   :25.0   Max.   :120.00
-```
+TOML has some features that aren’t completely compatible with R. Some of
+these I’m planning on addressing, some of them are just not manageable
+at all. On top of those, this package will only read TOML - the
+underlying library doesn’t support generating TOML files.
 
-You’ll still need to render `README.Rmd` regularly, to keep `README.md`
-up-to-date. `devtools::build_readme()` is handy for this.
+### Dates and times
 
-You can also embed plots, for example:
+TOML has four date- and time-related types. Base R doesn’t have a type
+for times, but there are classes for dates and date-times. Currently,
+rtoml parses and dates, times, and date-times into custom types, but
+could be converted into more common types. Times could be optionally
+converted to `hms::hms()`.
 
-<img src="man/figures/README-pressure-1.png" width="100%" />
+RcppTOML converts dates into `Date`, and both local date-times and
+date-times to `POSIXct`, and times are converted to text. tomledit
+leaves all dates and times as text.
 
-In that case, don’t forget to commit and push the resulting figure
-files, so they display on GitHub and CRAN.
+### Arrays and vectors
+
+TOML supports arrays containing a mix of different types. Because of
+this, rtoml treats arrays as unnamed lists. R users probably expect an
+array all of the same type to be treated as a vector, which is what
+RcppTOML does. I just haven’t figured out how to do that yet.
+
+## Extra tests
+
+I’m working on testing this against the [standard test
+suite](https://github.com/toml-lang/toml-test).
