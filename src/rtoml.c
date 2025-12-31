@@ -34,7 +34,7 @@ SEXP parse_int64(toml_datum_t node) {
 }
 
 SEXP parse_float64(toml_datum_t node) {
-  return Rf_ScalarInteger(node.u.fp64);
+  return Rf_ScalarReal(node.u.fp64);
 }
 
 SEXP parse_boolean(toml_datum_t node) {
