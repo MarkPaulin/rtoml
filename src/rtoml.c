@@ -111,12 +111,76 @@ SEXP parse_time(toml_datum_t node) {
   return vals;
 }
 
+SEXP flatten_bool(SEXP x, int len) {
+  SEXP out = PROTECT(Rf_allocVector(LGLSXP, len));
+  for (int i = 0; i < len; i++) {
+    SET_LOGICAL_ELT(out, i, LOGICAL(VECTOR_ELT(x, i))[0]);
+  }
+  UNPROTECT(1);
+  return out;
+}
+
+SEXP flatten_numeric(SEXP x, int len) {
+  SEXP out = PROTECT(Rf_allocVector(REALSXP, len));
+  for (int i = 0; i < len; i++) {
+    SET_REAL_ELT(out, i, REAL(VECTOR_ELT(x, i))[0]);
+  }
+  UNPROTECT(1);
+  return out;
+}
+
+SEXP flatten_integer(SEXP x, int len) {
+  SEXP out = PROTECT(Rf_allocVector(INTSXP, len));
+  for (int i = 0; i < len; i++) {
+    SET_INTEGER_ELT(out, i, INTEGER(VECTOR_ELT(x, i))[0]);
+  }
+  UNPROTECT(1);
+  return out;
+}
+
+SEXP flatten_string(SEXP x, int len) {
+  SEXP out = PROTECT(Rf_allocVector(STRSXP, len));
+  for (int i = 0; i < len; i++) {
+    SET_STRING_ELT(out, i, STRING_ELT(VECTOR_ELT(x, i), 0));
+  }
+  UNPROTECT(1);
+  return out;
+}
+
 SEXP parse_array(toml_datum_t node) {
   int len = node.u.arr.size;
+  bool single_type = true;
+  SEXPTYPE last_type = NILSXP;
+
   SEXP out = PROTECT(Rf_allocVector(VECSXP, len));
 
   for (int i = 0; i < len; i++) {
     SET_VECTOR_ELT(out, i, parse_node(node.u.arr.elem[i]));
+    if (single_type) {
+      if (last_type == NILSXP) {
+        last_type = TYPEOF(VECTOR_ELT(out, i));
+      } else {
+        single_type = last_type == TYPEOF(VECTOR_ELT(out, i));
+      }
+    }
+  }
+
+  if (single_type) {
+    switch (last_type) {
+      case STRSXP:
+        out = flatten_string(out, len);
+        break;
+      case REALSXP:
+        out = flatten_numeric(out, len);
+        break;
+      case INTSXP:
+        out = flatten_integer(out, len);
+        break;
+      case LGLSXP:
+        out = flatten_bool(out, len);
+        break;
+      default:
+    }
   }
 
   UNPROTECT(1);

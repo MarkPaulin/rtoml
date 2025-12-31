@@ -29,7 +29,8 @@ Convert TOML documents into lists:
 ``` r
 library(rtoml)
 
-x <- parse_toml('
+x <- parse_toml(
+  '
 title = "rtoml!"
 today = 2025-12-30
 
@@ -39,7 +40,8 @@ status = "In development"
 [package.todo]
 dates = "Convert to R date types"
 arrays = "Flatten them into vectors"
-')
+'
+)
 
 # or...
 # x <- read_toml("file.toml")
@@ -62,6 +64,11 @@ these I’m planning on addressing, some of them are just not manageable
 at all. On top of those, this package will only read TOML - the
 underlying library doesn’t support generating TOML files.
 
+### Integers
+
+TOML supports 64-bit integers, which are bigger than R’s 32-bit
+integers. Any integers outside this range are coerced to numerics.
+
 ### Dates and times
 
 TOML has four date- and time-related types. Base R doesn’t have a type
@@ -74,14 +81,8 @@ RcppTOML converts dates into `Date`, and both local date-times and
 date-times to `POSIXct`, and times are converted to text. tomledit
 leaves all dates and times as text.
 
-### Arrays and vectors
-
-TOML supports arrays containing a mix of different types. Because of
-this, rtoml treats arrays as unnamed lists. R users probably expect an
-array all of the same type to be treated as a vector, which is what
-RcppTOML does. I just haven’t figured out how to do that yet.
-
 ## Extra tests
 
 I’m working on testing this against the [standard test
-suite](https://github.com/toml-lang/toml-test).
+suite](https://github.com/toml-lang/toml-test). Results are [in this
+repo](https://github.com/MarkPaulin/rtoml-test).
