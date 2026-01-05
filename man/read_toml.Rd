@@ -5,13 +5,15 @@
 \alias{parse_toml}
 \title{Convert a TOML string to an R list}
 \usage{
-parse_toml(x)
+parse_toml(x, flatten = TRUE)
 
-read_toml(x)
+read_toml(x, flatten = TRUE)
 }
 \arguments{
 \item{x}{A length-one character vector, either a path to a file for
 \code{read_toml()} or a TOML document for \code{parse_toml()}}
+
+\item{flatten}{Convert single-type arrays to a vector, default \code{TRUE}}
 }
 \value{
 A list
