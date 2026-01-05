@@ -4,16 +4,16 @@
 
 #include "tomlc17.h"
 
-SEXP parse_node(toml_datum_t node);
+SEXP parse_node(toml_datum_t node, bool flatten);
 
-SEXP parse_table(toml_datum_t node) {
+SEXP parse_table(toml_datum_t node, bool flatten) {
   int len = node.u.tab.size;
   SEXP keys = PROTECT(Rf_allocVector(STRSXP, len));
   SEXP vals = PROTECT(Rf_allocVector(VECSXP, len));
 
   for (int i = 0; i < len; i++) {
     SET_STRING_ELT(keys, i, Rf_mkCharLen(node.u.tab.key[i], node.u.tab.len[i]));
-    SET_VECTOR_ELT(vals, i, parse_node(node.u.tab.value[i]));
+    SET_VECTOR_ELT(vals, i, parse_node(node.u.tab.value[i], flatten));
   }
 
   Rf_setAttrib(vals, R_NamesSymbol, keys);
@@ -147,7 +147,7 @@ SEXP flatten_string(SEXP x, int len) {
   return out;
 }
 
-SEXP parse_array(toml_datum_t node) {
+SEXP parse_array(toml_datum_t node, bool flatten) {
   int len = node.u.arr.size;
   bool single_type = true;
   SEXPTYPE last_type = NILSXP;
@@ -155,8 +155,8 @@ SEXP parse_array(toml_datum_t node) {
   SEXP out = PROTECT(Rf_allocVector(VECSXP, len));
 
   for (int i = 0; i < len; i++) {
-    SET_VECTOR_ELT(out, i, parse_node(node.u.arr.elem[i]));
-    if (single_type) {
+    SET_VECTOR_ELT(out, i, parse_node(node.u.arr.elem[i], flatten));
+    if (flatten && single_type) {
       if (last_type == NILSXP) {
         last_type = TYPEOF(VECTOR_ELT(out, i));
       } else {
@@ -165,7 +165,7 @@ SEXP parse_array(toml_datum_t node) {
     }
   }
 
-  if (single_type) {
+  if (flatten && single_type) {
     switch (last_type) {
       case STRSXP:
         out = flatten_string(out, len);
@@ -180,6 +180,7 @@ SEXP parse_array(toml_datum_t node) {
         out = flatten_bool(out, len);
         break;
       default:
+        break;
     }
   }
 
@@ -187,10 +188,10 @@ SEXP parse_array(toml_datum_t node) {
   return out;
 }
 
-SEXP parse_node(toml_datum_t node) {
+SEXP parse_node(toml_datum_t node, bool flatten) {
   switch (node.type) {
   case TOML_TABLE:
-    return parse_table(node);
+    return parse_table(node, flatten);
   case TOML_STRING:
     return parse_string(node);
   case TOML_INT64:
@@ -208,13 +209,13 @@ SEXP parse_node(toml_datum_t node) {
   case TOML_DATETIMETZ:
     return parse_datetime(node);
   case TOML_ARRAY:
-    return parse_array(node);
+    return parse_array(node, flatten);
   default:
     return R_NilValue;
   }
 }
 
-SEXP parse_result(toml_result_t result) {
+SEXP parse_result(toml_result_t result, bool flatten) {
   if (!result.ok) {
     char msg[200];
     memcpy(msg, result.errmsg, 200); 
@@ -227,23 +228,25 @@ SEXP parse_result(toml_result_t result) {
     Rf_error("Unknown datum type");
   }
   
-  SEXP res = PROTECT(parse_node(result.toptab));
+  SEXP res = PROTECT(parse_node(result.toptab, flatten));
   toml_free(result);
   UNPROTECT(1);
   return res;
 }
 
-SEXP parse_toml_(SEXP str) {
+SEXP parse_toml_(SEXP str, SEXP flatten) {
+    bool flatten_ = LOGICAL_ELT(flatten, 0);
     const char* str_c = Rf_translateCharUTF8(STRING_ELT(str, 0));
     toml_result_t result = toml_parse(str_c, strlen(str_c));
 
-    return parse_result(result);
+    return parse_result(result, flatten_);
 }
 
-SEXP read_toml_(SEXP path) {
+SEXP read_toml_(SEXP path, SEXP flatten) {
+    bool flatten_ = LOGICAL_ELT(flatten, 0);
     const char* filename = Rf_translateCharUTF8(STRING_ELT(path, 0));
     filename = R_ExpandFileName(filename);
     toml_result_t result = toml_parse_file_ex(filename);
 
-    return parse_result(result);
+    return parse_result(result, flatten_);
 }

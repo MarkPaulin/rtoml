@@ -2,6 +2,7 @@
 #'
 #' @param x A length-one character vector, either a path to a file for
 #' `read_toml()` or a TOML document for `parse_toml()`
+#' @param flatten Convert single-type arrays to a vector, default `TRUE`
 #'
 #' @returns A list
 #' @name read_toml
@@ -10,12 +11,12 @@ NULL
 
 #' @rdname read_toml
 #' @export
-parse_toml <- function(x) {
-  .Call(parse_toml_, x)
+parse_toml <- function(x, flatten = TRUE) {
+  .Call(parse_toml_, x, flatten)
 }
 
 #' @rdname read_toml
 #' @export
-read_toml <- function(x) {
-  .Call(read_toml_, x)
+read_toml <- function(x, flatten = TRUE) {
+  .Call(read_toml_, x, flatten)
 }
